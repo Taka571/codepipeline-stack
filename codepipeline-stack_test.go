@@ -9,12 +9,12 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-func TestCodepipelineStackStack(t *testing.T) {
+func TestCodepipelineStack(t *testing.T) {
 	// GIVEN
 	app := awscdk.NewApp(nil)
 
 	// WHEN
-	stack := NewCodepipelineStackStack(app, "MyStack", nil)
+	stack := NewCodepipelineStack(app, "MyStack", nil)
 
 	// THEN
 	bytes, err := json.Marshal(app.Synth(nil).GetStackArtifact(stack.ArtifactId()).Template())
