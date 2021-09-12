@@ -91,15 +91,31 @@ func createGithubSourceAction() awscodepipelineactions.GitHubSourceAction {
 }
 
 func createPipelineProject(scope constructs.Construct) awscodebuild.PipelineProject {
-	managedPolicies := []awsiam.IManagedPolicy{
-		awsiam.ManagedPolicy_FromManagedPolicyArn(scope, jsii.String("SampleManagedPolicy"), jsii.String("arn:aws:iam::aws:policy/AdministratorAccess")),
-	}
+	policyStatement := awsiam.NewPolicyStatement(&awsiam.PolicyStatementProps{
+		Actions: &[]*string{
+			jsii.String("ecr:BatchCheckLayerAvailability"),
+			jsii.String("ecr:GetAuthorizationToken"),
+			jsii.String("ecr:PutImage"),
+			jsii.String("ecr:InitiateLayerUpload"),
+			jsii.String("ecr:UploadLayerPart"),
+			jsii.String("ecr:CompleteLayerUpload"),
+		},
+		Effect:    awsiam.Effect_ALLOW,
+		Resources: &[]*string{jsii.String("*")},
+	})
+
+	policyDocument := awsiam.NewPolicyDocument(&awsiam.PolicyDocumentProps{
+		Statements: &[]awsiam.PolicyStatement{policyStatement},
+	})
+
+	inlinePolicies := make(map[string]awsiam.PolicyDocument)
+	inlinePolicies["ecrAccessPolicy"] = policyDocument
 
 	servicePrincipal := awsiam.NewServicePrincipal(jsii.String("codebuild.amazonaws.com"), &awsiam.ServicePrincipalOpts{})
 
 	deployRole := awsiam.NewRole(scope, jsii.String("SampleCodeBuildDeployRole"), &awsiam.RoleProps{
-		AssumedBy:       servicePrincipal,
-		ManagedPolicies: &managedPolicies,
+		InlinePolicies: &inlinePolicies,
+		AssumedBy:      servicePrincipal,
 	})
 
 	environmentVariables := make(map[string]*awscodebuild.BuildEnvironmentVariable)
