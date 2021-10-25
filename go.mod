@@ -9,5 +9,5 @@ require (
 	github.com/stretchr/testify v1.7.0
 
 	// for testing
-	github.com/tidwall/gjson v1.9.0
+	github.com/tidwall/gjson v1.9.3
 )
